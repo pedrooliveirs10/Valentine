@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Will you be my valentine?</title>
+
+  <style>
+    :root { --card-w: min(520px, 92vw); }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top, #f8c7d7, #f3a9c5 55%, #f19bb9);
+    }
+
+    .card{
+      width: var(--card-w);
+      background: rgba(255,255,255,0.92);
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.15);
+      padding: 28px 22px 22px;
+      text-align:center;
+      position: relative;
+      overflow:hidden;
+    }
+
+    .emoji{
+  width: 100px;          /* ajusta se quiseres maior/menor */
+  height: 100px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji img{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.emoji img{
+  animation: float 2.5s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{ transform: translateY(0); }
+  50%{ transform: translateY(-6px); }
+}
+
+
+    .title{
+      margin: 10px 0 22px;
+      font-size: clamp(20px, 4.2vw, 28px);
+      font-weight: 800;
+      color:#222;
+      display:inline-flex;
+      align-items:baseline;
+      gap:.28em;
+      white-space:nowrap;
+    }
+
+    .heart svg{
+      width:26px;
+      height:26px;
+      animation:pulse 1.15s infinite;
+    }
+
+    @keyframes pulse{
+      0%,100%{ transform:scale(1); }
+      50%{ transform:scale(1.12); }
+    }
+
+    .arena{
+      position: relative;
+      height: 140px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      user-select:none;
+    }
+    .footer-note{
+  margin-top: 10px;
+  font-size: 13px;
+  color: #666;
+  opacity: 0.85;
+}
+
+    button{
+      border:0;
+      padding:14px 26px;
+      font-size:18px;
+      font-weight:800;
+      border-radius:999px;
+      cursor:pointer;
+      transition: transform .2s ease;
+    }
+
+    #Sim{
+      background:#ff4b7a;
+      color:white;
+      box-shadow:0 12px 30px rgba(255,75,122,.35);
+    }
+
+    /* ✅ IMPORTANTE: o "Não" começa NORMAL (sem absolute) */
+    #No{
+      background:#e9e9ee;
+      color:#222;
+      padding:12px 22px;
+      font-size:16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.10);
+    }
+
+    .toast{
+      margin-top:14px;
+      font-weight:800;
+      font-size:20px;
+      display:none;
+    }
+    .toast.show{ display:block; }
+
+    /* ❤️ animação dos corações */
+    @keyframes floatUp {
+      from { transform: translateY(0) scale(1); opacity:1; }
+      to   { transform: translateY(-120px) scale(1.4); opacity:0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="emoji">
+        <img src="cat-heart.png" alt="Gato fofo com coração">
+      </div>
+      
+
+    <h1 class="title">
+      Inês queres ser a minha Valentine
+      <span class="heart">
+        <svg viewBox="0 0 64 64">
+          <path fill="#ff4b7a"
+            d="M32 55s-18-11.2-25.2-21C.6 25.2 4.8 14 16.6 13.4c5.2-.3 9.6 2.2 12.1 6
+               2.5-3.8 6.9-6.3 12.1-6C54.6 14 58.8 25.2 57.2 34c-7.2 9.8-25.2 21-25.2 21z"/>
+        </svg>
+      </span>
+     ?
+    </h1>
+
+    <div class="arena" id="arena">
+      <button id="Sim">Sim</button>
+      <button id="Não">Não</button>
+    </div>
+    <div class="footer-note" id="footerNote">
+        O não é um bocadinho fugitivo 😈
+      </div>
+      
+    <div class="toast" id="toast">Yay!!Está marcado, não podes fugir 💘</div>
+  </div>
+
+  <script>
+    const arena = document.getElementById("arena");
+    const noBtn  = document.getElementById("Não");
+    const yesBtn = document.getElementById("Sim");
+    const toast  = document.getElementById("toast");
+
+    let noIsAbsolute = false;
+
+    function moveNoButton() {
+      const a = arena.getBoundingClientRect();
+
+      // 1ª vez: tirar do flex e passar para absolute mantendo posição atual
+      if (!noIsAbsolute) {
+        const b = noBtn.getBoundingClientRect();
+        noBtn.style.position = "absolute";
+        noBtn.style.left = `${b.left - a.left}px`;
+        noBtn.style.top  = `${b.top  - a.top }px`;
+        noBtn.style.zIndex = "2";
+        noIsAbsolute = true;
+      }
+
+      const b2 = noBtn.getBoundingClientRect();
+      const padding = 10;
+
+      const maxX = a.width - b2.width - padding;
+      const maxY = a.height - b2.height - padding;
+
+      const x = Math.random() * maxX + padding;
+      const y = Math.random() * maxY + padding;
+
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top  = `${y}px`;
+    }
+
+    // foge
+    noBtn.addEventListener("mouseover", moveNoButton);
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive:false });
+
+    // clique no YES (só 1 listener ✅)
+    yesBtn.addEventListener("click", () => {
+      yesBtn.textContent = "SIMMMMM!!! 💖";
+      yesBtn.style.transform = "scale(1.15)";
+
+      noBtn.style.display = "none";
+      toast.classList.add("show");
+      document.getElementById("footerNote").style.display = "none";
+
+      for (let i = 0; i < 18; i++) createHeart();
+    });
+
+    function createHeart(){
+      const h = document.createElement("div");
+      h.textContent = "💖";
+      h.style.position = "absolute";
+      h.style.left = Math.random() * 100 + "%";
+      h.style.bottom = "0";
+      h.style.fontSize = "20px";
+      h.style.pointerEvents = "none";
+      h.style.animation = "floatUp 2s ease forwards";
+      arena.appendChild(h);
+      setTimeout(() => h.remove(), 2000);
+    }
+  </script>
+</body>
+</html>
